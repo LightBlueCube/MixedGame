@@ -71,7 +71,10 @@ void function OnTitanSpawned( entity titan )
         foreach ( entity mainWeapon in titan.GetMainWeapons() )
         {
             if ( mainWeapon.GetWeaponClassName() == "mp_titanweapon_sniper" )
+            {
                 mainWeapon.AddMod( "knockback_sniper" )
+                mainWeapon.AddMod( "titan_sniper_scope" ) // add a scope just for fun
+            }
         }
     }
 

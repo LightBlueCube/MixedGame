@@ -345,6 +345,12 @@ void function TitanReplace_GiveTitanLoadoutReplace( entity titan )
 		case $"models/titans/light/titan_light_raptor.mdl":
 			if ( file.northstarMiscFixEnabled )
 			{
+				if ( titan.GetMainWeapons().len() > 0 )
+				{
+					entity mainWeapon = titan.GetMainWeapons()[0]
+					mainWeapon.AddMod( "titan_sniper_scope" ) // add a scope just for fun
+				}
+
 				entity utilityWeapon = titan.GetOffhandWeapon( OFFHAND_ANTIRODEO )
 				if ( IsValid( utilityWeapon ) )
 				{

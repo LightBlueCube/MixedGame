@@ -11,6 +11,11 @@ WeaponData
 	"tracer_effect"   							"P_wpn_arcball_beam"
 	"tracer_effect_first_person"  				"P_wpn_arcball_beam"
 
+	// unused bodygroup: scope
+	// Bodygroups:
+	"bodygroup1_name"	"attachment1"
+	"bodygroup1_set"	"0"
+
 	Mods
 	{
 		stryder_sniper
@@ -102,52 +107,11 @@ WeaponData
 		knockback_sniper
 		{
 		}
-	}
 
-	RUI_CrosshairData
-	{
-		DefaultArgs
+		// cosmetic: enable scope bodygroup
+		titan_sniper_scope
 		{
-			adjustedSpread				weapon_spread
-			adsFrac 					player_zoomFrac
-			isSprinting					player_is_sprinting
-			isReloading					weapon_is_reloading
-			readyFrac                   progress_ready_to_fire_frac
-			teamColor					crosshair_team_color
-			isAmped						weapon_is_amped
-			chargeFrac                  player_chargeFrac
-			crosshairMovementX          crosshair_movement_x
-			crosshairMovementY          crosshair_movement_y
-		}
-
-		Crosshair_1
-		{
-			"ui"						"ui/crosshair_titan_sniper"
-			"base_spread"				"10.0"
-			Args
-			{
-				isFiring				weapon_is_firing
-			}
-		}
-
-		Crosshair_2
-		{
-			"ui"						"ui/crosshair_charge_rifle"
-			"base_spread"				"10.0"
-			Args
-			{
-				isFiring				weapon_is_firing
-			}
-		}
-
-		Crosshair_3
-		{
-			"ui"						"ui/crosshair_circle2"
-			"base_spread"				"0.0"
-			Args
-			{
-				isFiring				weapon_is_firing
-			}
+			"bodygroup1_set"	"1"
 		}
 	}
 }
