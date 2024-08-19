@@ -321,7 +321,13 @@ void function OnGravityLiftTriggerEnter( entity trigger, entity ent )
 void function OnGravityLiftTriggerLeave( entity trigger, entity ent )
 {
 	if ( !EntityAllowedToTriggerGravLift( ent ) ) // generic check
-		return
+	{
+		// entity type can be changed in gravity lift, like embark into a titan, so check here
+		if( !( ent in file.playerInGravLiftCount ) )
+			return
+		if( file.playerInGravLiftCount[ ent ] == 0 )
+			return
+	}
 
 	if ( ent.IsPlayer() && file.playerInGravLiftCount[ ent ] == 0 ) // no lift valid!
 		return
@@ -332,7 +338,7 @@ void function OnGravityLiftTriggerLeave( entity trigger, entity ent )
 		if ( file.playerInGravLiftCount[ ent ] > 1 ) // still have other lifts left
 			shouldEndLift = false
 	}
-	
+
 	if ( shouldEndLift )
 	{
 		ent.Signal( "LeaveGravityLift" ) // this will end other gravlifts
@@ -381,6 +387,7 @@ void function EntityInGravityLift( entity ent, entity trigger )
 	ent.EndSignal( "OnDestroy" )
 	if ( ent.IsPlayer() || ent.IsNPC() ) // these entities may die
 		ent.EndSignal( "OnDeath" )
+	ent.EndSignal( "player_embarks_titan" )
 	ent.EndSignal( "EnterGravityLift" )
 	ent.EndSignal( "LeaveGravityLift" )
 
@@ -388,7 +395,7 @@ void function EntityInGravityLift( entity ent, entity trigger )
 	if ( ent.IsPlayer() ) // add a bit visual effect for player
 		visualStatusEffect = StatusEffect_AddEndless( ent, eStatusEffect.emp, 0.05 )
 
-	table storedStats = 
+	table storedStats =
 	{
 		gravity = float( ent.kv.gravity ) // npc specific
 		lastTickVel = < 0, 0, 0 > // player specific
@@ -403,7 +410,7 @@ void function EntityInGravityLift( entity ent, entity trigger )
 			if ( IsValid( ent ) ) // any valid ent should be restore gravity or someother keyvalues
 			{
 				// player specifics
-				if ( ent.IsPlayer() ) 
+				if ( ent.IsPlayer() )
 				{
 					if ( visualStatusEffect > -1 )
 						StatusEffect_Stop( ent, visualStatusEffect )
@@ -424,11 +431,11 @@ void function EntityInGravityLift( entity ent, entity trigger )
 				}
 
 				// consider this means the entity is force bounced away, or trigger caused them being force bounced
-				if ( !ent.IsPlayer() || results.bouncedFromLift || !IsValid( trigger ) ) 
+				if ( !ent.IsPlayer() || results.bouncedFromLift || !IsValid( trigger ) )
 					BounceEntityForward( ent )
 				else
 					BouncePlayerFromLift( ent, expect vector( storedStats.lastTickVel ) ) // last tick's velocity can mostly get player's move direction
-			
+
 				if ( results.bouncedFromLift && IsValid( trigger ) ) // remove entity from current trigger if it's force bounced!
 					ScriptTriggerRemoveEntity( trigger, ent )
 			}
