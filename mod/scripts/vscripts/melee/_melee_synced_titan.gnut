@@ -93,6 +93,9 @@ struct TitanExcutionData
 	// mostly for buddy victim animations, because they don't have AE_MELEE_KILLED instead has AE_NPC_SYNCED_MELEE_DEATH
 	// for that case, we kill the target once their sequence is done, force ragdolling them
 	table<string, bool> killTargetOnSequenceEnds
+	// modified variable for us add more pilot sequence detail to fix some behavior..?
+	// maybe no need to implement though... just remove bad pilot sequences
+	table<string, string> targetAnimation3pPilotAttachment
 }
 
 struct
@@ -242,6 +245,31 @@ void function Init3pExecutions()
 	buddyScorchVictimData.attackerAnimation3pPilot[ "buddy" ] <- ""
 	// due we don't have AE_MELEE_KILLED events, target should die on their sequence ends and always ragdoll themselves
 	buddyScorchVictimData.killTargetOnSequenceEnds[ "buddy" ] <- true
+
+
+	// fix for being executed by BT
+	// most MP titans don't have their attachment updated for being executed
+	// so we'd remove their pilot viewbody from existence
+	TitanExcutionData buddyKickshootAttackerData = file.executionData_3p[ "execution_bt_kickshoot" ]
+	// MP titans( monarch and prime titans ) have bad pilot attachments, should be empty
+	buddyKickshootAttackerData.targetAnimation3pPilot[ "stryder" ] <- ""
+	buddyKickshootAttackerData.targetAnimation3pPilot[ "atlas" ] <- ""
+	buddyKickshootAttackerData.targetAnimation3pPilot[ "ogre" ] <- ""
+
+	// welp actually this one don't even have pilot attached inside...
+	/*
+	TitanExcutionData buddyFlipAttackerData = file.executionData_3p[ "execution_bt_flip" ]
+	// MP titans( monarch and prime titans ) have bad pilot attachments, should be empty
+	buddyFlipAttackerData.targetAnimation3pPilot[ "stryder" ] <- ""
+	buddyFlipAttackerData.targetAnimation3pPilot[ "atlas" ] <- ""
+	buddyFlipAttackerData.targetAnimation3pPilot[ "ogre" ] <- ""
+
+	TitanExcutionData buddyDefaultAttackerData = file.executionData_3p[ "execution_bt" ]
+	// MP titans( monarch and prime titans ) have bad pilot attachments, should be empty
+	buddyDefaultAttackerData.targetAnimation3pPilot[ "stryder" ] <- ""
+	buddyDefaultAttackerData.targetAnimation3pPilot[ "atlas" ] <- ""
+	buddyDefaultAttackerData.targetAnimation3pPilot[ "ogre" ] <- ""
+	*/
 }
 
 // vanilla missing!!!! we want other files can get all executions we registered
@@ -2871,6 +2899,10 @@ void function TitanVsTitan_3p( SyncedMelee action, entity attacker, entity targe
 		targetViewBody.SetContinueAnimatingAfterRagdoll( true )
 
 		targetBodySequence.attachment = "ref"
+		// modified: attachment override
+		if ( victimType in data.targetAnimation3pPilotAttachment )
+			targetBodySequence.attachment = data.targetAnimation3pPilotAttachment[ victimType ]
+		//
 		targetBodySequence.teleport = true
 		targetBodySequence.thirdPersonAnim = data.targetAnimation3pPilot[ victimType ]
 

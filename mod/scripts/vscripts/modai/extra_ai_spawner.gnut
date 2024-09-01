@@ -10707,6 +10707,14 @@ function OnNpcTitanBecomesPilot( pilot, titan )
 		//titan.SetAISettings( aiSetFile.slice( 0, aiSetFile.len() - 7 ) ) // not ejecting, back to normal health bar
 		//Highlight_ClearEnemyHighlight( titan ) // this resets highlights in modified sh_highlights
 	
+		// update last attacker for pilot
+		if ( ( "attacker" in titanSoul.lastAttackInfo ) )
+		{
+			entity titanLastAttacker = expect entity( titanSoul.lastAttackInfo.attacker )
+			if ( IsValid( titanLastAttacker ) && titanLastAttacker != titan )
+				pilot.e.lastAttacker = titanLastAttacker
+		}
+
 		// restore mark for pilot
 		if ( titanSoul in file.soulEmbarkedNPCSpawnFromExtraSpawner )
 		{
