@@ -158,9 +158,11 @@ int function FireMissileStream( entity weapon, WeaponPrimaryAttackParams attackP
 	bool adsPressed = weapon.IsWeaponInAds()
 	bool hasAmmoSwap = weapon.HasMod( "brute4_cluster_payload_ammo" )
 
-    // defensive fix for sometimes player don't gain single shot mod
+    // defensive fix for sometimes player don't gain single shot mod, or retain ads mod trhough offhand weapons
     if ( adsPressed && !hasAmmoSwap && !weapon.HasMod( "brute4_single_shot" ) )
 		OnWeaponStartZoomIn_TitanWeapon_Brute4_QuadRocket( weapon )
+	else if ( !adsPressed && weapon.HasMod( "brute4_single_shot" ) )
+		OnWeaponStartZoomOut_TitanWeapon_Brute4_QuadRocket( weapon )
 
     // modified
 	if ( hasAmmoSwap )

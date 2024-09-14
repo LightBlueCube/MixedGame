@@ -241,10 +241,12 @@ int function FireMissileStream( entity weapon, WeaponPrimaryAttackParams attackP
 	bool has_mortar_mod = weapon.HasMod( "coop_mortar_titan" )
 	bool hasRapidShot = weapon.HasMod( "rapid_fire_missiles" ) // modded weapon: TF|1 quad rocket mod
 
-	// defensive fix for sometimes player don't gain single shot mod
+	// defensive fix for sometimes player don't gain single shot mod, or retain ads mod trhough offhand weapons
 	// this is not vanilla behavior, but vanilla also don't have this weapon appeared in MP, so I'd fix it
     if ( adsPressed && !hasAmmoSwap && !weapon.HasMod( "rocketstream_fast" ) && !hasRapidShot )
 		OnWeaponStartZoomIn_TitanWeapon_Rocketeer_RocketStream( weapon )
+	else if ( !adsPressed && weapon.HasMod( "rocketstream_fast" ) )
+		OnWeaponStartZoomOut_TitanWeapon_Rocketeer_RocketStream( weapon )
 
 	// modified
 	if ( hasAmmoSwap )

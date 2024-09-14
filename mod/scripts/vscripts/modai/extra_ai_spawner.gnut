@@ -8574,6 +8574,13 @@ void function NPCPilotActivatesStim( entity pilot, entity weapon )
 	const float tickRate = 0.2 // npc think don't need very accurate value
 	while ( Time() < endTime )
 	{
+		// to fake player behavior, stimming pilot needs to be damaged before they can clear damage history
+		if ( pilot.GetHealth() == pilot.GetMaxHealth() )
+		{
+			WaitFrame()
+			continue
+		}
+
 		// reworked: taking damage will reduce regen rate but won't stop regen
 		//if ( Time() - GetNPCLastDamageTime( pilot ) >= NPC_PILOT_STIM_REGEN_STOP_DURATION )
 		//{

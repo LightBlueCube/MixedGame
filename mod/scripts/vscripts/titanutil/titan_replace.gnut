@@ -278,6 +278,7 @@ void function TitanReplace_GiveTitanLoadoutReplace( entity titan )
 	{
 		// ronin fix and balance...
 		case $"models/titans/light/titan_light_locust.mdl":
+		case $"models/titans/light/titan_light_ronin_prime.mdl": // though prime titans may get alternative loadout soon, we still needs to update their basic loadout!
 			if ( file.roninMiscFixEnabled )
 			{
 				entity coreWeapon = titan.GetOffhandWeapon( OFFHAND_EQUIPMENT )
@@ -317,6 +318,7 @@ void function TitanReplace_GiveTitanLoadoutReplace( entity titan )
 
 		// ion fix...
 		case $"models/titans/medium/titan_medium_ajax.mdl":
+		case $"models/titans/medium/titan_medium_ion_prime.mdl": 
 			if ( file.ionMiscFixEnabled )
 			{
 				if ( titan.GetMainWeapons().len() > 0 )
@@ -343,6 +345,7 @@ void function TitanReplace_GiveTitanLoadoutReplace( entity titan )
 		
 		// northstar fix and balance...
 		case $"models/titans/light/titan_light_raptor.mdl":
+		case $"models/titans/light/titan_light_northstar_prime.mdl":
 			if ( file.northstarMiscFixEnabled )
 			{
 				if ( titan.GetMainWeapons().len() > 0 )

@@ -34,7 +34,8 @@ function SetMissileTarget( entity missile, entity target, entity weaponOwner )
 #if SERVER
 var function OnWeaponNpcPrimaryAttack_yh803Rocket( entity weapon, WeaponPrimaryAttackParams attackParams )
 {
-	weapon.EmitWeaponSound( "rocket_pod_fire" )
+	// "rocket_pod_fire" does not exist
+	//weapon.EmitWeaponSound( "rocket_pod_fire" )
 	weapon.EmitWeaponNpcSound( LOUD_WEAPON_AI_SOUND_RADIUS_MP, 0.2 )
 
 	entity missile = FireWeaponMissile_RecordData( weapon, attackParams.pos, attackParams.dir, 1, damageTypes.largeCaliberExp, damageTypes.largeCaliberExp, false, PROJECTILE_NOT_PREDICTED )

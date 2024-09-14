@@ -8,7 +8,8 @@ npc_pilot_elite
 	ArmorType						normal
 	TraverseAnimType				human
 
-	difficultTraverseFlags	256			// 1 << 8 (TRAVERSE_JUMP_UP_DOWN_128)
+	// we can't make them traverse like spectres damn... maybe removing this could get them more vertical mobility?
+	//difficultTraverseFlags	256			// 1 << 8 (TRAVERSE_JUMP_UP_DOWN_128)
 
 	smartAmmoLockAttachmentName0	CHESTFOCUS
 

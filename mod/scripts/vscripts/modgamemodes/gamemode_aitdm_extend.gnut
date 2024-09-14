@@ -116,6 +116,7 @@ void function Modded_Gamemode_AITdm_Extended_Init()
 {
 	// this is incorrect. gamemode_tdm spawns are for AITdm
 	//SetSpawnpointGamemodeOverride( ATTRITION ) // use bounty hunt spawns as vanilla game has no spawns explicitly defined for aitdm
+	SetSpawnpointGamemodeOverride( TEAM_DEATHMATCH )
 
 	AddCallback_GameStateEnter( eGameState.Prematch, OnPrematchStart )
 	AddCallback_GameStateEnter( eGameState.Playing, OnPlaying )
@@ -1815,8 +1816,9 @@ entity function FindBestSpawnForNPCDrop( array<entity> spawnPoints, int team, fl
 	array<entity> validSpawnPoints
 
 	// modified: make a new function so ai gamemodes don't have to re-decide for each spawn
-	//entity zone = DecideSpawnZone_Generic( points, team )
-	entity zone = GetCurrentSpawnZoneForTeam( team )
+	// due to spawn points refactor, let's change back to older version
+	entity zone = DecideSpawnZone_Generic( spawnPoints, team )
+	//entity zone = GetCurrentSpawnZoneForTeam( team )
 
 	if ( IsValid( zone ) )
 	{
@@ -1875,11 +1877,12 @@ entity function FindBestSpawnForNPCDrop( array<entity> spawnPoints, int team, fl
 	return validSpawnPoints[ RandomInt( validSpawnPoints.len() ) ]
 }
 
-// return true if "lastUsedTime" not in point.s
+// return true if "inUse" not in point.s
 bool function InitNPCSpawnpoint( entity point )
 {
-	if ( !( "lastUsedTime" in point.s ) )
+	if ( !( "inUse" in point.s ) )
 	{
+		point.s.inUse <- false
 		point.s.lastUsedTime <- -999
 		return true
 	}
