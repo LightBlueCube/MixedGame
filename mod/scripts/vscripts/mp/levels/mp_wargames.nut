@@ -7,7 +7,7 @@ struct {
 	float introStartTime
 	entity militiaPod
 	entity imcPod
-
+	
 	vector militiaPodFXEyePos
 	vector imcPodFXEyePos
 } file
@@ -33,17 +33,17 @@ const array<asset> IMC_GRUNT_MODELS =
 void function CodeCallback_MapInit()
 {
 	AddCallback_EntitiesDidLoad( AddEvacNodes )
-
+	
 	// dissolve effects
 	RegisterSignal( "EnsureWargamesDeathEffectIsClearedForPlayer" )
 	AddCallback_OnPlayerKilled( WargamesOnPlayerKilled )
 	AddCallback_OnNPCKilled( WargamesOnNPCKilled )
-
+	
 	// marvin
 	RegisterSignal( "MarvinSpawnerThink" )
 	AddSpawnCallback( "info_spawnpoint_marvin", AddMarvinSpawner )
 	AddCallback_GameStateEnter( eGameState.Prematch, SpawnMarvinsForRound )
-
+	
 	// currently disabled until finished: intro
 	if ( !IsFFAGame() )
 		ClassicMP_SetLevelIntro( WargamesIntroSetup, 20.0 )
@@ -55,9 +55,9 @@ void function AddEvacNodes()
 	AddEvacNode( GetEnt( "evac_location2" ) )
 	AddEvacNode( GetEnt( "evac_location3" ) )
 	AddEvacNode( GetEnt( "evac_location4" ) )
-
+	
 	SetEvacSpaceNode( GetEnt( "end_spacenode" ) )
-}
+}	
 
 // dissolve effects
 void function WargamesOnPlayerKilled( entity deadEnt, entity attacker, var damageInfo )
@@ -118,7 +118,7 @@ void function DissolveEntityWrapped( entity ent )
 	{
 		ent.Dissolve( ENTITY_DISSOLVE_CHAR, < 0, 0, 0 >, 500 )
 		EmitSoundAtPosition( TEAM_UNASSIGNED, ent.GetOrigin(), "Object_Dissolve" )
-
+		
 		if ( ent.IsPlayer() )
 			thread EnsureWargamesDeathEffectIsClearedForPlayer( ent )
 	}
@@ -140,10 +140,10 @@ void function EnsureWargamesDeathEffectIsClearedForPlayer( entity player )
 	{
 		if ( Time() > endTime ) // if we wait too long, just ignore
 			return
-
-		WaitFrame()
+	
+		WaitFrame() 
 	}
-
+	
 	player.kv.VisibilityFlags = ENTITY_VISIBLE_TO_EVERYONE
 }
 
@@ -200,7 +200,7 @@ void function OnWargamesMarvinDamaged( entity marvin, var damageInfo )
 	marvin.SetInvulnerable()
 }
 
-// intro stuff:
+// intro stuff: 
 void function WargamesIntroSetup()
 {
 	PrecacheParticleSystem( FX_POD_SCREEN_IN )
@@ -208,7 +208,7 @@ void function WargamesIntroSetup()
 	PrecacheParticleSystem( $"P_pod_Dlight_console1" )
 	PrecacheParticleSystem( $"P_pod_Dlight_console2" )
 	PrecacheParticleSystem( $"P_pod_door_glow_FP" )
-
+	
 	PrecacheModel( $"models/titans/ogre/ogreposeopen.mdl" )
 
 	file.militiaPod = GetEnt( "training_pod" )
@@ -236,23 +236,23 @@ void function OnPrematchStart()
 {
 	ClassicMP_OnIntroStarted()
 	file.introStartTime = Time()
-
+	
 	// set up shared objects
 	// this breaks glowlights, not sure why
 	//file.imcPod.RenderWithViewModels( true )
 	//file.militiaPod.RenderWithViewModels( true )
-
+	
 	PodFXLights( file.imcPod )
 	PodFXLights( file.militiaPod )
-
+	
 	FirstPersonSequenceStruct openPodSequence
 	openPodSequence.thirdPersonAnimIdle = "trainingpod_doors_open_idle"
 	thread FirstPersonSequence( openPodSequence, file.imcPod )
 	thread FirstPersonSequence( openPodSequence, file.militiaPod )
-
+	
 	// militia titans/marvins
 	entity militiaOgre = CreatePropDynamic( $"models/titans/ogre/ogreposeopen.mdl", < -2060, 2856, -1412.5 >, < 0, 0, 0 > )
-
+	
 	entity militiaOgreMarvin1 = CreateMarvin( TEAM_UNASSIGNED, < -2113, 2911, -1412 >, < 0, 20, 0 > )
 	DispatchSpawn( militiaOgreMarvin1 )
 	thread PlayAnim( militiaOgreMarvin1, "mv_idle_weld" ) // we also have "mv_wargames_intro", but it's not for this one...
@@ -260,11 +260,11 @@ void function OnPrematchStart()
 	entity militiaOgreMarvin2 = CreateMarvin( TEAM_UNASSIGNED, < -2040, 2788, -1412 >, < 0, 140, 0 > )
 	DispatchSpawn( militiaOgreMarvin2 )
 	thread PlayAnim( militiaOgreMarvin2, "mv_idle_weld" ) // we also have "mv_wargames_intro", but it's not for this one...
-
+	
 	entity militiaOgreMarvin3 = CreateMarvin( TEAM_UNASSIGNED, < -2116, 2868, -1458 >, < 0, 127, 0 > )
 	DispatchSpawn( militiaOgreMarvin3 )
 	thread PlayAnim( militiaOgreMarvin3, "mv_turret_repair_A_idle" ) // we also have "mv_wargames_intro", but it's not for this one...
-
+	
 	entity militiaIon = CreatePropDynamic( $"models/titans/medium/titan_medium_ajax.mdl", < -1809.98, 2790.39, -1409 >, < 0, 80, 0 > )
 	thread PlayAnim( militiaIon, "at_titan_activation_wargames_intro" )
 	militiaIon.Anim_SetInitialTime( 4.5 )
@@ -282,27 +282,27 @@ void function OnPrematchStart()
 	militiaGrunt.MarkAsNonMovingAttachment()
 	militiaGrunt.Anim_Play( "pt_titan_activation_pilot" )
 	militiaGrunt.Anim_EnableUseAnimatedRefAttachmentInsteadOfRootMotion()
-
+	
 	entity militiaMarvinChillin = CreateMarvin( TEAM_UNASSIGNED, < -1786, 3060, -1412 >, < 0, -120, 0 > )
 	DispatchSpawn( militiaMarvinChillin )
 	thread PlayAnim( militiaMarvinChillin, "mv_idle_unarmed" )
-
+	
 	// imc grunts
 	entity imcGrunt1 = CreatePropDynamic( IMC_GRUNT_MODELS[ RandomInt( IMC_GRUNT_MODELS.len() ) ], < -2915, 2867, -1788 >, < 0, -137, 0 > )
 	thread PlayAnim( imcGrunt1, "pt_console_idle" )
-
+	
 	entity imcGrunt2 = CreatePropDynamic( IMC_GRUNT_MODELS[ RandomInt( IMC_GRUNT_MODELS.len() ) ], < -2870, 2746, -1786 >, < 0, -167, 0 > )
 	thread PlayAnim( imcGrunt2, "pt_console_idle" )
 	imcGrunt2.Anim_SetInitialTime( 2.0 )
-
+	
 	entity imcGrunt3 = CreatePropDynamic( IMC_GRUNT_MODELS[ RandomInt( IMC_GRUNT_MODELS.len() ) ], < -3037, 2909, -1786 >, < 0, -60, 0 > )
 	thread PlayAnim( imcGrunt3, "pt_console_idle" )
 	imcGrunt3.Anim_SetInitialTime( 4.0 )
-
+	
 	entity imcGrunt4 = CreatePropDynamic( IMC_GRUNT_MODELS[ RandomInt( IMC_GRUNT_MODELS.len() ) ], < -3281, 2941, -1790 >, < 0, 138, 0 > )
 	thread PlayAnim( imcGrunt4, "pt_console_idle" )
 	imcGrunt4.Anim_SetInitialTime( 6.0 )
-
+	
 	// launch players into intro
 	foreach ( entity player in GetPlayerArray() )
 	{
@@ -311,10 +311,10 @@ void function OnPrematchStart()
 		else
 			RespawnPrivateMatchSpectator( player )
 	}
-
+	
 	// 7 seconds of nothing until we start the pod sequence
 	wait 7.0
-
+	
 	FirstPersonSequenceStruct podCloseSequence
 	podCloseSequence.thirdPersonAnim = "trainingpod_doors_close"
 	podCloseSequence.thirdPersonAnimIdle = "trainingpod_doors_close_idle"
@@ -322,25 +322,25 @@ void function OnPrematchStart()
 		thread FirstPersonSequence( podCloseSequence, file.imcPod )
 	if( IsValid( file.militiaPod ) )
 		thread FirstPersonSequence( podCloseSequence, file.militiaPod )
-
+	
 	wait 7.0
 	if( IsValid( file.imcPod ) )
 		thread PodBootFXThread( file.imcPod )
 	if( IsValid( file.militiaPod ) )
 		thread PodBootFXThread( file.militiaPod )
-
+	
 	wait 6.0
 	ClassicMP_OnIntroFinished()
-
+	
 	// make sure we stop using viewmodels for these otherwise everyone can see them in the floor 24/7
 	if( IsValid( file.imcPod ) )
 		file.imcPod.RenderWithViewModels( false )
 	if( IsValid( file.militiaPod ) )
 		file.militiaPod.RenderWithViewModels( false )
-
+	
 	//PodFXCleanup( file.imcPod )
 	//PodFXCleanup( file.militiaPod )
-
+	
 	// cleanup intro objects
 	if( IsValid( militiaOgre ) )
 		militiaOgre.Destroy()
@@ -359,7 +359,7 @@ void function OnPrematchStart()
 		militiaOgreMarvin3.Destroy()
 	if( IsValid( militiaMarvinChillin ) )
 		militiaMarvinChillin.Destroy()
-
+	
 	if( IsValid( imcGrunt1 ) )
 		imcGrunt1.Destroy()
 	if( IsValid( imcGrunt2 ) )
@@ -393,17 +393,17 @@ void function PlayerWatchesWargamesIntro( entity player )
 			player.ClearInvulnerable()
 			if ( !IsAlive( player ) )
 				player.Anim_Stop()
-
+			
 			Remote_CallFunction_NonReplay( player, "ServerCallback_ClearFactionLeaderIntro" )
 		}
 	})
-
+	
 	// we need to wait a frame if we killed ourselves to spawn into this, so just easier to do it all the time to remove any weirdness
 	// also helps other on-spawn functions to set up( specially for client script inits )
 	WaitFrame()
-
+	
 	player.EndSignal( "OnDeath" )
-
+	
 	int factionTeam = ConvertPlayerFactionToIMCOrMilitiaTeam( player )
 	entity playerPod
 	// default team is IMC
@@ -417,7 +417,7 @@ void function PlayerWatchesWargamesIntro( entity player )
 		playerPod = file.militiaPod
 	else
 		playerPod = file.imcPod
-
+	
 	// setup player
 	int podAttachId = playerPod.LookupAttachment( "REF" )
 	player.SetOrigin( playerPod.GetAttachmentOrigin( podAttachId ) )
@@ -425,10 +425,10 @@ void function PlayerWatchesWargamesIntro( entity player )
 	DecideRespawnPlayer( player )
 	player.SetParent( playerPod, "REF" )
 	player.ForceStand()
-
+	
 	if ( !HasAnimEvent( player.GetFirstPersonProxy(), "PlaySound_SimPod_DoorShut" ) )
 		AddAnimEvent( player.GetFirstPersonProxy(), "PlaySound_SimPod_DoorShut", PlaySound_SimPod_DoorShut )
-
+	
 	AddCinematicFlag( player, CE_FLAG_CLASSIC_MP_SPAWNING )
 	player.kv.VisibilityFlags = ENTITY_VISIBLE_TO_OWNER
 	//player.DisableWeaponViewModel()
@@ -436,14 +436,14 @@ void function PlayerWatchesWargamesIntro( entity player )
 	HolsterAndDisableWeapons(player)
 	player.MovementDisable()
 	player.SetInvulnerable()
-
+	
 	if ( factionTeam == TEAM_MILITIA && GetFactionChoice( player ) == "faction_marvin" )
 		Remote_CallFunction_NonReplay( player, "ServerCallback_SpawnMilitiaFactionLeaderForIntro", file.introStartTime, playerPod.GetEncodedEHandle() )
 	else if ( factionTeam == TEAM_MILITIA )
 		Remote_CallFunction_NonReplay( player, "ServerCallback_SpawnMilitiaFactionLeaderForIntro", file.introStartTime + 1.75, playerPod.GetEncodedEHandle() )
 	else
 		Remote_CallFunction_NonReplay( player, "ServerCallback_SpawnIMCFactionLeaderForIntro", file.introStartTime + 4.5, playerPod.GetEncodedEHandle() )
-
+	
 	// idle pod sequence
 	FirstPersonSequenceStruct podIdleSequence
 	podIdleSequence.firstPersonAnimIdle = "ptpov_trainingpod_idle"
@@ -452,7 +452,7 @@ void function PlayerWatchesWargamesIntro( entity player )
 	thread FirstPersonSequence( podIdleSequence, player, playerPod )
 	// manually call viewcone function
 	TrainingPod_ViewConeLock_PodIdle( player )
-
+	
 	// reworked here: for matching other intro spawn, always do same screen fade
 	//ScreenFadeFromBlack( player, max( 0.0, ( file.introStartTime + 0.5 ) - Time() ), max( 0.0, ( file.introStartTime + 0.5 ) - Time() ) )
 	//ScreenFadeFromBlack( player, max( 0.0, ( file.introStartTime + 3.0 ) - Time() ), max( 0.0, ( file.introStartTime + 1.0 ) - Time() ) )
@@ -463,10 +463,10 @@ void function PlayerWatchesWargamesIntro( entity player )
 		file.imcPodFXEyePos = player.EyePosition()
 	else if ( file.militiaPodFXEyePos == < 0, 0, 0 > && factionTeam == TEAM_MILITIA )
 		file.militiaPodFXEyePos = player.EyePosition()
-
+	
 	// 7 seconds of nothing before we start the pod sequence
 	wait ( file.introStartTime + 7.0 ) - Time()
-
+	
 	FirstPersonSequenceStruct podCloseSequence
 	podCloseSequence.firstPersonAnim = "ptpov_trainingpod_doors_close"
 	podCloseSequence.renderWithViewModels = true
@@ -478,23 +478,23 @@ void function PlayerWatchesWargamesIntro( entity player )
 	// manually call viewcone function
 	TrainingPod_ViewConeLock_PodClosed( player )
 	WaittillAnimDone( player.GetFirstPersonProxy() ) // somehow this is better than just waiting for the blocking FirstPersonSequence call?
-
+	
 	// boot sequence
 	EmitSoundOnEntityOnlyToPlayer( player, player, "NPE_Scr_SimPod_PowerUp" )
-
+	
 	// 10 seconds of starting pod before we run effects and spawn players
 	// note, this is cool because it waits for a specific time, so we can have a blocking call directly before it just fine
 	wait ( file.introStartTime + 15.5 ) - Time()
 	Remote_CallFunction_NonReplay( player, "ServerCallback_PlayPodTransitionScreenFX" )
-
+	
 	// need to wait no matter what the delay is here so fx will sync up
 	wait 3.5
-
+	
 	entity spawnpoint = FindSpawnPoint( player, false, true )
 	spawnpoint.s.lastUsedTime = Time()
 	player.SetOrigin( spawnpoint.GetOrigin() )
 	player.SetAngles( spawnpoint.GetAngles() )
-
+	
 	thread DelayedGamemodeAnnouncement( player )
 }
 
@@ -544,7 +544,7 @@ void function TrainingPod_ViewConeLock_PodClosed( entity player )
 
 // intro pod fx
 // here be dragons etc hell code probably
-void function PodFXLights( entity pod )
+void function PodFXLights( entity pod ) 
 {
 	// dlights
 	pod.s.podLightFXHandles <- []
@@ -558,7 +558,7 @@ void function PodFXLasers( entity pod )
 	pod.s.leftLaserEmitter <- leftEmitter
 	entity rightEmitter = CreateScriptMover( pod.GetOrigin() )
 	pod.s.rightLaserEmitter <- rightEmitter
-
+	
 	thread PodFXLaserSweep( leftEmitter, pod, pod == file.imcPod ? file.imcPodFXEyePos : file.militiaPodFXEyePos, "fx_laser_L" )
 	thread PodFXLaserSweep( rightEmitter, pod, pod == file.imcPod ? file.imcPodFXEyePos : file.militiaPodFXEyePos, "fx_laser_R" )
 }
@@ -570,29 +570,29 @@ void function PodFXLaserSweep( entity emitter, entity pod, vector eyePos, string
 	emitter.SetParent( pod, attachment )
 
 	float sweepTime = RandomFloatRange( 2.9, 3.15 )
-
+	
 	vector centerAng = VectorToAngles( ( eyePos + < 0, 0, 7 > ) - emitter.GetOrigin() )
 	vector topAng = centerAng + < -270, 0, 0 >
 	vector bottomAng = centerAng + < -90, 0, 0 >
-
+	
 	emitter.s.fxHandle <- PlayLoopFXOnEntity( $"P_pod_scan_laser_FP", emitter )
-
+	
 	float finalCenterTime = sweepTime * 0.15
 	float bigSweepTime = ( sweepTime - finalCenterTime ) / 2
-
+	
 	emitter.SetAbsAngles( topAng )
 	emitter.NonPhysicsRotateTo( topAng, bigSweepTime, 0.0, bigSweepTime * 0.2 )
 	wait bigSweepTime - 0.1
-
+	
 	emitter.NonPhysicsRotateTo( bottomAng, bigSweepTime, 0.0, bigSweepTime * 0.2 )
 	wait bigSweepTime
-
+	
 	emitter.NonPhysicsRotateTo( centerAng, finalCenterTime, 0.0, finalCenterTime * 0.2 )
 }
 
 void function PodFXGlowLights( entity pod )
 {
-	// see sp_training:5533 (TrainingPod_GlowLightsArraySetup)
+	// see sp_training:5533 (TrainingPod_GlowLightsArraySetup)	
 	array< array< string > > glowLightGroups = [
 		[ "fx_glow_L_door012", "fx_glow_R_door014" ],
 		[ "fx_glow_L_door013", "fx_glow_R_door013" ],
@@ -609,14 +609,14 @@ void function PodFXGlowLights( entity pod )
 		[ "fx_glow_L_door01", "fx_glow_R_door01" ],
 		[ "fx_glow_L_door02", "fx_glow_R_door02" ]
 	]
-
+	
 	pod.s.podGlowLightFXHandles <- []
-
+	
 	foreach ( array<string> group in glowLightGroups )
 	{
 		foreach ( string attachName in group )
 			pod.s.podGlowLightFXHandles.append( PlayLoopFXOnEntity( $"P_pod_door_glow_FP", pod, attachName ) )
-
+		
 		wait 0.1
 	}
 }
@@ -638,9 +638,9 @@ void function PodFXCleanup( entity pod )
 			handle.Destroy()
 		}
 	}
-
+	
 	pod.s.podLightFXHandles = []
-
+	
 	foreach ( entity handle in pod.s.podGlowLightFXHandles )
 	{
 		if ( IsValid_ThisFrame( handle ) )
@@ -650,14 +650,14 @@ void function PodFXCleanup( entity pod )
 			handle.Destroy()
 		}
 	}
-
+	
 	pod.s.podGlowLightFXHandles = []
-
+	
 	pod.s.leftLaserEmitter.s.fxHandle.SetStopType( "DestroyImmediately" )
 	pod.s.leftLaserEmitter.s.fxHandle.ClearParent()
 	pod.s.leftLaserEmitter.s.fxHandle.Destroy()
 	pod.s.leftLaserEmitter.Destroy()
-
+	
 	pod.s.rightLaserEmitter.s.fxHandle.SetStopType( "DestroyImmediately" )
 	pod.s.rightLaserEmitter.s.fxHandle.ClearParent()
 	pod.s.rightLaserEmitter.s.fxHandle.Destroy()
