@@ -22,7 +22,8 @@ void function GamemodePs_Init()
 	SetTimeoutWinnerDecisionFunc( CheckScoreForDraw )
 
 	// spawnzone stuff
-	SetShouldCreateMinimapSpawnZones( true )
+	// function has been removed
+	//SetShouldCreateMinimapSpawnZones( true )
 	
 	//AddCallback_OnPlayerKilled( CheckSpawnzoneSuspiciousDeaths )
 	//AddSpawnCallbackEditorClass( "trigger_multiple", "trigger_mp_spawn_zone", SpawnzoneTriggerInit )
