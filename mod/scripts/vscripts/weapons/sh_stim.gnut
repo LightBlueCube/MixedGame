@@ -22,6 +22,13 @@ void function StimShared_Init()
 
 	RegisterSignal( "EndStim" )
 	RegisterSignal( "StopEndlessStim" )
+
+	// to end stim while titan transfering
+	#if SERVER
+	RegisterSignal( "StimPlayerTitanTransfer" )
+	AddCallback_OnTitanBecomesPilot( SignalToEndStimOnTitanTransfer )
+	AddCallback_OnPilotBecomesTitan( SignalToEndStimOnTitanTransfer )
+	#endif
 }
 
 void function EndlessStimBegin( entity player, float effectSeverity )
@@ -40,21 +47,35 @@ void function StimPlayer( entity player, float duration, float severity = STIM_E
 
 void function StimPlayer_Internal( entity player, float duration, float effectSeverity )
 {
-	int endlessStatusEffectHandle = 0
+	// there're multiple effects handle we may want to track, just handle them all
+	//int endlessStatusEffectHandle = 0
+	array<int> stimStatusEffectsHandle
+	bool usingEndlessStim = false
 	if ( duration == USE_TIME_INFINITE )
 	{
-		endlessStatusEffectHandle = StatusEffect_AddEndless( player, eStatusEffect.speed_boost, effectSeverity )
+		//endlessStatusEffectHandle = StatusEffect_AddEndless( player, eStatusEffect.speed_boost, effectSeverity )
+		stimStatusEffectsHandle.append( StatusEffect_AddEndless( player, eStatusEffect.speed_boost, effectSeverity ) )
+		// maybe we also wants visual effect?
+		if ( player.IsPlayer() ) // add npc stim compatibility
+			stimStatusEffectsHandle.append( StatusEffect_AddEndless( player, eStatusEffect.stim_visual_effect, 1.0 ) )
+		usingEndlessStim = true // mark that we're using endless stim
 	}
 	else
 	{
+		/*
 		StatusEffect_AddTimed( player, eStatusEffect.speed_boost, effectSeverity, duration + 0.5, 0.25 ) // sound is slightly off
 		// add npc stim compatibility
 		if ( player.IsPlayer() )
 			StatusEffect_AddTimed( player, eStatusEffect.stim_visual_effect, 1.0, duration, duration )
+		*/
+		stimStatusEffectsHandle.append( StatusEffect_AddTimed( player, eStatusEffect.speed_boost, effectSeverity, duration + 0.5, 0.25 ) )
+		if ( player.IsPlayer() ) // add npc stim compatibility
+			stimStatusEffectsHandle.append( StatusEffect_AddTimed( player, eStatusEffect.stim_visual_effect, 1.0, duration, duration ) )
 	}
 
 #if SERVER
-	thread StimThink( player, duration, endlessStatusEffectHandle )
+	//thread StimThink( player, duration, endlessStatusEffectHandle )
+	thread StimThink( player, duration, stimStatusEffectsHandle, usingEndlessStim )
 #else
 	entity cockpit = player.GetCockpit()
 	if ( !IsValid( cockpit ) )
@@ -65,21 +86,35 @@ void function StimPlayer_Internal( entity player, float duration, float effectSe
 }
 
 #if SERVER
-void function StimThink( entity player, float duration, int endlessStatusEffectHandle )
+// there're multiple effects handle we may want to track, just handle them all
+//void function StimThink( entity player, float duration, int endlessStatusEffectHandle )
+void function StimThink( entity player, float duration, array<int> stimStatusEffectsHandle, bool usingEndlessStim = false )
 {
 	player.EndSignal( "OnDeath" )
+	player.EndSignal( "OnDestroy" ) // should be vanilla missing?
 	// add npc stim compatibility
 	if ( player.IsPlayer() )
-		player.EndSignal( "OnChangedPlayerClass" )
-	if ( endlessStatusEffectHandle != 0 )
+	{
+		// changing vanilla behavior here:
+		// stim should be ended once player doing a titan trasfer, and preserves if we only updated pilot classmods or something( which we used for wallclimbing stuffs )
+		//player.EndSignal( "OnChangedPlayerClass" )
+		player.EndSignal( "StimPlayerTitanTransfer" )
+	}
+	// change to use a variable for handling
+	//if ( endlessStatusEffectHandle != 0 )
+	if ( usingEndlessStim )
 		player.EndSignal( "StopEndlessStim" )
 
 	// clear last sound so player won't receive too much noise!
 	if ( player.IsPlayer() )
 		StopSoundOnEntity( player, "pilot_stimpack_loop_1P" )
 	StopSoundOnEntity( player, "pilot_stimpack_loop_3P" )
-	// add npc stim compatibility
-	if ( player.IsPlayer() )
+	StopSoundOnEntity( player, "Pilot_Stimpack_Loop" )
+
+	// change to use TF1 looping sound for endless stim( maybe a little bit annoying? idk )
+	if ( usingEndlessStim )
+		EmitSoundOnEntity( player, "Pilot_Stimpack_Loop" )
+	else if ( player.IsPlayer() ) // add npc stim compatibility
 	{
 		EmitSoundOnEntityOnlyToPlayer( player, player, "pilot_stimpack_loop_1P" )
 		EmitSoundOnEntityExceptToPlayer( player, player, "pilot_stimpack_loop_3P" )
@@ -100,7 +135,8 @@ void function StimThink( entity player, float duration, int endlessStatusEffectH
 	//thread StimSlowmoAim( player, duration )
 
 	OnThreadEnd(
-		function() : ( player, stimFX, endlessStatusEffectHandle )
+		//function() : ( player, stimFX, endlessStatusEffectHandle )
+		function() : ( player, stimFX, stimStatusEffectsHandle )
 		{
 			// this vanilla behavior looks bad... get rid of it
 			//if ( !IsValid( player ) )
@@ -113,9 +149,16 @@ void function StimThink( entity player, float duration, int endlessStatusEffectH
 			{
 				StopSoundOnEntity( player, "pilot_stimpack_loop_1P" )
 				StopSoundOnEntity( player, "pilot_stimpack_loop_3P" )
+				StopSoundOnEntity( player, "Pilot_Stimpack_Loop" )
 
-				if ( endlessStatusEffectHandle != 0 )
-					StatusEffect_Stop( player, endlessStatusEffectHandle )
+				// clean up multiple effects
+				//if ( endlessStatusEffectHandle != 0 )
+				//	StatusEffect_Stop( player, endlessStatusEffectHandle )
+				foreach ( effect in stimStatusEffectsHandle )
+				{
+					if ( effect != 0 )
+						StatusEffect_Stop( player, effect )
+				}
 
 				player.Signal( "EndStim" )
 			}
@@ -149,6 +192,12 @@ void function StimThink( entity player, float duration, int endlessStatusEffectH
 	{
 		wait duration
 	}
+}
+
+// to end stim while titan transfering
+void function SignalToEndStimOnTitanTransfer( entity player, entity titan )
+{
+	player.Signal( "StimPlayerTitanTransfer" )
 }
 
 #else // #if SERVER

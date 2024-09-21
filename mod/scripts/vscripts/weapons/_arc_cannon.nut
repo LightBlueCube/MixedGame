@@ -202,8 +202,9 @@ function ArcCannon_ChargeBegin( entity weapon )
 	#endif
 
 	// effect handle
-	weapon.PlayWeaponEffect( $"wpn_arc_cannon_charge_fp", $"wpn_arc_cannon_charge", "muzzle_flash" )
-	thread TrackArcCannonChargeEffect( weapon, weaponOwner )
+	// now change to use settings file
+	//weapon.PlayWeaponEffect( $"wpn_arc_cannon_charge_fp", $"wpn_arc_cannon_charge", "muzzle_flash" )
+	//thread TrackArcCannonChargeEffect( weapon, weaponOwner )
 }
 
 void function TrackArcCannonChargeEffect( entity weapon, entity weaponOwner )
@@ -252,7 +253,8 @@ function ArcCannon_ChargeEnd( entity weapon, entity player = null )
 	#endif
 
 	// effect handle
-	weapon.StopWeaponEffect( $"wpn_arc_cannon_charge_fp", $"wpn_arc_cannon_charge" )
+	// now change to use settings file
+	//weapon.StopWeaponEffect( $"wpn_arc_cannon_charge_fp", $"wpn_arc_cannon_charge" )
 }
 
 #if SERVER
@@ -319,7 +321,8 @@ function FireArcCannon( entity weapon, WeaponPrimaryAttackParams attackParams )
 
 	// stop charge effect upon firing because we've reworked charge effect method
 	weapon.Signal( ARC_CANNON_SIGNAL_FIREWEAPON ) // trigger TrackArcCannonChargeEffect() to end charge effect
-	weapon.StopWeaponEffect( $"wpn_arc_cannon_charge_fp", $"wpn_arc_cannon_charge" ) // defensive fix
+	// now change to use settings file
+	//weapon.StopWeaponEffect( $"wpn_arc_cannon_charge_fp", $"wpn_arc_cannon_charge" ) // defensive fix
 
 	local attachmentName = "muzzle_flash"
 	local attachmentIndex = weapon.LookupAttachment( attachmentName )

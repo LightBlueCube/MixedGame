@@ -105,6 +105,10 @@ void function DestroyOnDeathDelayed( entity turret, float delay )
 // return null if we failed to deploy
 entity function DeployTurretFromNPCWithSetup( entity npc, bool doAnimatedDeploy = false )
 {
+	//he's busy right now
+	if ( !IsAlive( npc ) || !npc.IsInterruptable() )
+   		return null
+	
 	asset turretModel = GetNPCTurretPlaceModel( npc )
 	InitTurretPoseDataForModel( turretModel )
 
@@ -204,6 +208,9 @@ void function TurretGruntThink( entity npc )
 		// modified: npc may try to disembark a droppod or dropship
 		if ( npc.Anim_IsActive() )
 			continue
+		// pain animation checks
+		if ( !npc.IsInterruptable() )
+			continue
 
 		entity enemy = npc.GetEnemy()
 		if ( !IsAlive( enemy ) )
@@ -234,18 +241,25 @@ void function TurretGruntThink( entity npc )
 			continue
 		}
 
-		waitthread TurretWaitTillDeath( turret )
+		waitthread TurretWaitTillDeadOrHacked( npc, turret )
 
 		wait 20 // longer cooldown than drones
 	}
 }
 
-void function TurretWaitTillDeath( entity turret )
+void function TurretWaitTillDeadOrHacked( entity npc, entity turret )
 {
 	turret.EndSignal( "OnDestroy" )
 	turret.EndSignal( "OnDeath" )
 
-	WaitForever()
+	// better use a loop to check teams though
+	//WaitForever()
+	while ( true )
+	{
+		WaitFrame()
+		if ( turret.GetTeam() != npc.GetTeam() )
+			return
+	}
 }
 
 void function TurretCleanupOnOwnerDeath_Thread( entity owner, entity turret )

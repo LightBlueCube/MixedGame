@@ -130,11 +130,16 @@ WeaponData
 	"vortex_drain"									".15"
 
 	// Fix Northstar: charge effect should be handled by script
-	//"charge_effect_1p"							"wpn_arc_cannon_charge_fp"
-	//"charge_effect_3p"							"wpn_arc_cannon_charge"
-	//"charge_effect_attachment"					"muzzle_flash"	
+	// change back to use settings: "charge_effect_show_during_drain" could help
+	"charge_effect_1p"								"wpn_arc_cannon_charge_fp"
+	"charge_effect_3p"								"wpn_arc_cannon_charge"
+	"charge_effect_attachment"						"muzzle_flash"	
+	// missing effect for charging
+	"charge_effect2_1p"								"wpn_ARC_knob_FP"
+	"charge_effect2_3p"								"wpn_ARC_knob"
+	"charge_effect2_attachment"						"SPINNING_KNOB"
 
-
+	"charge_effect_show_during_drain"				"0"
 
 	// Spread
 	"spread_stand_hip"  							"10"

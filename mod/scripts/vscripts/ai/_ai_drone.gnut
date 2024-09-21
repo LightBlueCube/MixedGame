@@ -920,6 +920,10 @@ entity function SpawnDroneFromNPC( entity npc, string aiSettings )
 	if ( !IsAlive( npc ) || !npc.IsInterruptable() )
    		return null
 
+	// Don't deploy if would hit ceiling, droppod, etc
+	if ( !DroneHasEnoughRoomToDeployFromNPC( npc ) )
+		return null
+
 	vector origin = npc.GetOrigin()
 	vector angles = npc.GetAngles()
 	int team = npc.GetTeam()
@@ -1069,15 +1073,22 @@ function DroneGruntThink( entity npc, string aiSettings )
 	entity closestEnemy
 	npc.EnableNPCFlag( NPC_USE_SHOOTING_COVER | NPC_CROUCH_COMBAT )
 
+	bool failDeployChecks = false
 	while ( true )
 	{
+		// can't implement state changes
 		//if ( npc.GetNPCState() == "idle" )
 		//{
 		//	npc.WaitSignal( "OnStateChange" )
 		//	continue
 		//}
 
-		wait ( RandomFloatRange( 0, 1.0 ) )
+		// use more constant wait if we didn't fail anim checks and stuff
+		//wait ( RandomFloatRange( 0, 1.0 ) )
+		if ( failDeployChecks )
+			WaitFrame()
+		else
+			wait ( RandomFloatRange( 0, 1.0 ) )
 
 		//dont do stuff when animating on a parent
 		if ( npc.GetParent() )
@@ -1086,10 +1097,14 @@ function DroneGruntThink( entity npc, string aiSettings )
 		// modified: npc may try to disembark a droppod or dropship
 		if ( npc.Anim_IsActive() )
 			continue
+		// pain animation checks
+		if ( !npc.IsInterruptable() )
+			continue
 
 		// Don't deploy if would hit ceiling, droppod, etc
-		if ( !DroneHasEnoughRoomToDeployFromNPC( npc ) )
-			continue
+		// moving this check to SpawnDroneFromNPC(), cuz in this state drone maybe valid to deploy, want to do less wait
+		//if ( !DroneHasEnoughRoomToDeployFromNPC( npc ) )
+		//	continue
 
 		entity enemy = npc.GetEnemy()
 		if ( !IsAlive( enemy ) )
@@ -1112,9 +1127,13 @@ function DroneGruntThink( entity npc, string aiSettings )
 		}
 		drone = SpawnDroneFromNPC( npc, aiSettings )
 		if ( drone == null )
+		{
+			// failed to deploy, but we're in valid deployment state, do less wait
+			failDeployChecks = true
 			continue
+		}
 
-		waitthread DroneWaitTillDeadOrHacked( drone )
+		waitthread DroneWaitTillDeadOrHacked( npc, drone )
 
 		wait 15
 	}
@@ -1139,13 +1158,22 @@ function DroneHasEnoughRoomToDeployFromNPC( npc )
 
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function DroneWaitTillDeadOrHacked( drone )
+// use typed function could be better
+//function DroneWaitTillDeadOrHacked( drone )
+void function DroneWaitTillDeadOrHacked( entity npc, entity drone )
 {
 	drone.EndSignal( "OnDestroy" )
 	drone.EndSignal( "OnDeath" )
-	drone.EndSignal( "OnNewOwner" )
+	// better use a loop to check teams though
+	//drone.EndSignal( "OnNewOwner" )
 
-	WaitForever()
+	//WaitForever()
+	while ( true )
+	{
+		WaitFrame()
+		if ( drone.GetTeam() != npc.GetTeam() )
+			return
+	}
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void function DroneDeath( entity drone, var damageInfo )

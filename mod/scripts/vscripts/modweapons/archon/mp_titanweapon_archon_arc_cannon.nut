@@ -164,7 +164,8 @@ bool function OnWeaponChargeBegin_titanweapon_archon_arc_cannon( entity weapon )
 	weapon.EmitWeaponSound("MegaTurret_Laser_ChargeUp_3P")
 
 	// effect handle
-	weapon.PlayWeaponEffect( $"wpn_arc_cannon_charge_fp", $"wpn_arc_cannon_charge", "muzzle_flash" )
+	// now change to use settings file
+	//weapon.PlayWeaponEffect( $"wpn_arc_cannon_charge_fp", $"wpn_arc_cannon_charge", "muzzle_flash" )
 
 	return true
 }
@@ -174,7 +175,8 @@ void function OnWeaponChargeEnd_titanweapon_archon_arc_cannon( entity weapon )
 	weapon.StopWeaponSound("MegaTurret_Laser_ChargeUp_3P")
 
 	// effect handle
-	weapon.StopWeaponEffect( $"wpn_arc_cannon_charge_fp", $"wpn_arc_cannon_charge" )
+	// now change to use settings file
+	//weapon.StopWeaponEffect( $"wpn_arc_cannon_charge_fp", $"wpn_arc_cannon_charge" )
 }
 
 var function OnWeaponPrimaryAttack_titanweapon_archon_arc_cannon( entity weapon, WeaponPrimaryAttackParams attackParams )
@@ -380,14 +382,15 @@ function FireArchonCannon( entity weapon, WeaponPrimaryAttackParams attackParams
 	
 	weapon.EmitWeaponSound_1p3p( "weapon_electric_smoke_electrocute_titan_1p", "weapon_electric_smoke_electrocute_titan_3p")
 	weapon.EmitWeaponSound_1p3p( "weapon_batterygun_firestart_1p", "weapon_batterygun_fire_energydrained_3p")
-	// change to use weapon mod
+	// change to use weapon mod to append firing sound. hardcoded though
 	//if (weapon.GetWeaponClassName() == "mp_titanweapon_archon_arc_cannon")
 	if ( weapon.HasMod( "archon_arc_cannon" ) ) // arc cannon firing
 	{
 		if ( owner.IsNPC() || charge >= ARCHON_CANNON_DAMAGE_CHARGE_RATIO ) // npc firing or player firing with high charge frac, do a extra sound
 			weapon.EmitWeaponSound_1p3p( "MegaTurret_Laser_Fire_3P", "MegaTurret_Laser_Fire_3P")
-		if ( owner.IsNPC() ) // for npcs, stop charge effect upon firing
-			weapon.StopWeaponEffect( $"wpn_arc_cannon_charge_fp", $"wpn_arc_cannon_charge" )
+		// now change to use settings file
+		//if ( owner.IsNPC() ) // for npcs, stop charge effect upon firing
+		//	weapon.StopWeaponEffect( $"wpn_arc_cannon_charge_fp", $"wpn_arc_cannon_charge" )
 	}
 	//if (weapon.GetWeaponClassName() == "mp_titanweapon_shock_shield")
 	if ( weapon.HasMod( "archon_shock_shield" ) ) // shock shield firing
